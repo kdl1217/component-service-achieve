@@ -1,0 +1,116 @@
+plugins {
+    id 'java'
+    id 'io.freefair.lombok' version '5.2.1' apply false
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE' apply false
+    id 'org.springframework.boot' version '2.6.1' apply false
+}
+
+allprojects {
+    group 'com.kon'
+    version '1.0-SNAPSHOT'
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://maven.aliyun.com/repository/public"
+        }
+    }
+}
+
+subprojects {
+    plugins.apply("java")
+    plugins.apply("checkstyle")
+    plugins.apply("io.freefair.lombok")
+    plugins.apply("io.spring.dependency-management")
+    plugins.apply("org.springframework.boot")
+
+    configurations {
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:2.6.1"
+        }
+
+        dependencies {
+            dependencySet(group: "org.slf4j", version: "1.7.30") {
+                entry "slf4j-api"
+                entry "slf4j-simple"
+                entry "slf4j-log4j12"
+            }
+
+            dependency "com.redislabs:jrejson:1.5.0"
+        }
+    }
+
+    dependencies {
+        implementation 'org.slf4j:slf4j-api'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+        testImplementation ("org.springframework.boot:spring-boot-starter-test") {
+            exclude group: "junit", module: "junit"
+            exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+        }
+    }
+
+    compileJava {
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xlint:unchecked"
+    }
+
+    compileTestJava {
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xlint:unchecked"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    task checkstyle(type: Checkstyle) {
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+        ignoreFailures true
+        showViolations true
+        source = fileTree('src')
+        include '**/*.java'
+        exclude '**/test/**'
+        exclude '**/build/**'
+        classpath = files()
+    }
+
+    task removeLombokConfig() {
+        def subProjectPath = project.projectDir
+        if (null != subProjectPath) {
+            def lombokConfigFile = new File(subProjectPath, "lombok.config")
+            if (lombokConfigFile.exists()) {
+                lombokConfigFile.delete()
+            }
+        }
+    }
+
+    task removeOutputLog() {
+        def subProjectPath = project.projectDir
+        if (null != subProjectPath) {
+            def logPath = new File(subProjectPath, "output.log")
+            if (logPath.exists()) {
+                logPath.delete()
+            }
+        }
+    }
+
+    jar {
+        exclude("**/application-*.yml")
+    }
+
+    defaultTasks "assemble"
+}
+
+

@@ -1,0 +1,12 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: redis-json-achieve
+  profiles:
+    active: dev
+
+redis:
+  host: kon
+  port: 6379

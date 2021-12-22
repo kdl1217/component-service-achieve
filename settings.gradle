@@ -1,0 +1,3 @@
+rootProject.name = 'component-service-achieve'
+include 'redis-json-achieve'
+
