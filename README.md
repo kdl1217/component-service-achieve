@@ -9,5 +9,5 @@
 ### 组件服务的使用
 
 ##### *包括组件*
-- [RedisJson](https://github.com/kdl1217/component-service-achieve/redis-json-achieve)
+- [RedisJson](https://github.com/kdl1217/component-service-achieve/tree/main/redis-json-achieve)
 
